@@ -1,5 +1,3 @@
-import copy
-
 class Node:
     def __init__(self, name, children=None, value=None):
         self.name = name  # Имя узла для отображения
@@ -19,8 +17,7 @@ def build_sample_tree():
     A3112 = Node("A3112", value=6)
     A311 = Node("A311", children=[A3111, A3112])
 
-    # Узел A312 (предположим, это лист без значения)
-    A312 = Node("A312", value=5)  # Присвоим значение 5, если это лист
+    A312 = Node("A312", value=5)
 
     # Узел A31
     A31 = Node("A31", children=[A311, A312])
@@ -41,7 +38,6 @@ def build_sample_tree():
     # Узел A3
     A3 = Node("A3", children=[A31, A32])
 
-    # Остальные части дерева (как в оригинальном коде)
     # Уровень 5 (листья)
     A11111 = Node("A11111", value=3)
     A11112 = Node("A11112", value=5)
