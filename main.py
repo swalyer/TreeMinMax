@@ -1,6 +1,5 @@
 import copy
 
-
 class Node:
     def __init__(self, name, children=None, value=None):
         self.name = name  # Имя узла для отображения
@@ -11,11 +10,38 @@ class Node:
     def is_leaf(self):
         return len(self.children) == 0
 
-
 def build_sample_tree():
     """
-    Создает пример дерева глубиной 5 уровней.
+    Создает дерево с указанными узлами и значениями.
     """
+    # Листовые узлы для A311
+    A3111 = Node("A3111", value=4)
+    A3112 = Node("A3112", value=6)
+    A311 = Node("A311", children=[A3111, A3112])
+
+    # Узел A312 (предположим, это лист без значения)
+    A312 = Node("A312", value=5)  # Присвоим значение 5, если это лист
+
+    # Узел A31
+    A31 = Node("A31", children=[A311, A312])
+
+    # Листовые узлы для A321
+    A3211 = Node("A3211", value=2)
+    A3212 = Node("A3212", value=9)
+    A321 = Node("A321", children=[A3211, A3212])
+
+    # Листовые узлы для A322
+    A3221 = Node("A3221", value=-2)
+    A3222 = Node("A3222", value=7)
+    A322 = Node("A322", children=[A3221, A3222])
+
+    # Узел A32
+    A32 = Node("A32", children=[A321, A322])
+
+    # Узел A3
+    A3 = Node("A3", children=[A31, A32])
+
+    # Остальные части дерева (как в оригинальном коде)
     # Уровень 5 (листья)
     A11111 = Node("A11111", value=3)
     A11112 = Node("A11112", value=5)
@@ -43,20 +69,20 @@ def build_sample_tree():
         Node("A122", value=1)
     ])
 
-    # Уровень 1
+    # Узел A1
     A1 = Node("A1", children=[A11, A12])
-    A2 = Node("A2", children=[
-        Node("A21", value=8),
-        Node("A22", children=[
-            Node("A221", value=5),
-            Node("A222", value=3)
-        ])
-    ])
 
-    # Корень
-    root = Node("Root", children=[A1, A2])
+    # Узел A2
+    A21 = Node("A21", value=8)
+    A221 = Node("A221", value=5)
+    A222 = Node("A222", value=3)
+    A22 = Node("A22", children=[A221, A222])
+    A2 = Node("A2", children=[A21, A22])
+
+    # Корневой узел
+    root = Node("Root", children=[A1, A2, A3])
+
     return root
-
 
 def print_tree(node, depth=0):
     indent = "  " * depth
@@ -66,7 +92,6 @@ def print_tree(node, depth=0):
     for child in node.children:
         print_tree(child, depth + 1)
 
-
 def minimax(node, is_maximizing, debug_info, order='left-to-right'):
     if node.is_leaf():
         node.minimax_value = node.value
@@ -74,29 +99,28 @@ def minimax(node, is_maximizing, debug_info, order='left-to-right'):
         return node.value
 
     # Изменение порядка обхода детей
-    children = node.children if order == 'left-to-right' else reversed(node.children)
+    children = node.children if order == 'left-to-right' else list(reversed(node.children))
 
     if is_maximizing:
         max_eval = float('-inf')
         debug_info['current_player'].append('MAX')
         for child in children:
-            eval = minimax(child, False, debug_info, order)
+            eval = minimax(child, False, debug_info, order)  # Инвертируем is_maximizing
             max_eval = max(max_eval, eval)
-            debug_info['intermediate_values'].append((node.name, max_eval))
         node.minimax_value = max_eval
+        debug_info['intermediate_values'].append((node.name, max_eval))
         debug_info['current_player'].pop()
         return max_eval
     else:
         min_eval = float('inf')
         debug_info['current_player'].append('MIN')
         for child in children:
-            eval = minimax(child, True, debug_info, order)
+            eval = minimax(child, True, debug_info, order)  # Инвертируем is_maximizing
             min_eval = min(min_eval, eval)
-            debug_info['intermediate_values'].append((node.name, min_eval))
         node.minimax_value = min_eval
+        debug_info['intermediate_values'].append((node.name, min_eval))
         debug_info['current_player'].pop()
         return min_eval
-
 
 def alpha_beta(node, is_maximizing, alpha, beta, debug_info, order='left-to-right'):
     if node.is_leaf():
@@ -105,37 +129,36 @@ def alpha_beta(node, is_maximizing, alpha, beta, debug_info, order='left-to-righ
         return node.value
 
     # Изменение порядка обхода детей
-    children = node.children if order == 'left-to-right' else reversed(node.children)
+    children = node.children if order == 'left-to-right' else list(reversed(node.children))
 
     if is_maximizing:
         max_eval = float('-inf')
         debug_info['current_player'].append('MAX')
         for child in children:
-            eval = alpha_beta(child, False, alpha, beta, debug_info, order)
+            eval = alpha_beta(child, False, alpha, beta, debug_info, order)  # Инвертируем is_maximizing
             max_eval = max(max_eval, eval)
             alpha = max(alpha, eval)
-            debug_info['intermediate_values'].append((node.name, max_eval))
             if beta <= alpha:
                 debug_info['pruned_branches'].append((node.name, child.name))
                 break
         node.minimax_value = max_eval
+        debug_info['intermediate_values'].append((node.name, max_eval))
         debug_info['current_player'].pop()
         return max_eval
     else:
         min_eval = float('inf')
         debug_info['current_player'].append('MIN')
         for child in children:
-            eval = alpha_beta(child, True, alpha, beta, debug_info, order)
+            eval = alpha_beta(child, True, alpha, beta, debug_info, order)  # Инвертируем is_maximizing
             min_eval = min(min_eval, eval)
             beta = min(beta, eval)
-            debug_info['intermediate_values'].append((node.name, min_eval))
             if beta <= alpha:
                 debug_info['pruned_branches'].append((node.name, child.name))
                 break
         node.minimax_value = min_eval
+        debug_info['intermediate_values'].append((node.name, min_eval))
         debug_info['current_player'].pop()
         return min_eval
-
 
 def change_leaf_values(node):
     if node.is_leaf():
@@ -150,7 +173,6 @@ def change_leaf_values(node):
         for child in node.children:
             change_leaf_values(child)
 
-
 def get_player_order():
     while True:
         choice = input("Установить роль корня как MAX или MIN? (Введите MAX/MIN): ").strip().upper()
@@ -158,7 +180,6 @@ def get_player_order():
             return choice
         else:
             print("Неверный выбор. Пожалуйста, введите MAX или MIN.")
-
 
 def get_analysis_order():
     while True:
@@ -169,8 +190,6 @@ def get_analysis_order():
             return 'right-to-left'
         else:
             print("Неверный выбор. Пожалуйста, введите 1 или 2.")
-
-
 def main():
     root = build_sample_tree()
     player_role = 'MAX'  # По умолчанию корень - MAX
@@ -199,14 +218,12 @@ def main():
             print(
                 f"Порядок анализа детей установлен как {'Слева-направо' if analysis_order == 'left-to-right' else 'Справа-налево'}.")
         elif choice == '4':
-            # Клонируем дерево, чтобы не изменять оригинал
-            tree_copy = copy.deepcopy(root)
             debug_info = {'evaluated_nodes': [], 'intermediate_values': [], 'current_player': []}
 
             # Определяем, является ли корень MAX или MIN
             is_maximizing = True if player_role == 'MAX' else False
 
-            minimax(tree_copy, is_maximizing, debug_info, analysis_order)
+            minimax(root, is_maximizing, debug_info, analysis_order)
             print("\nРезультаты минимаксного анализа:")
             print("Промежуточные оценки:")
             for name, value in debug_info['intermediate_values']:
@@ -214,16 +231,14 @@ def main():
             print("Оцененные листья:")
             for name, value in debug_info['evaluated_nodes']:
                 print(f"Лист {name}: {value}")
-            print(f"Выбранное значение корня: {tree_copy.minimax_value}")
+            print(f"Выбранное значение корня: {root.minimax_value}")
         elif choice == '5':
-            # Клонируем дерево, чтобы не изменять оригинал
-            tree_copy = copy.deepcopy(root)
             debug_info = {'evaluated_nodes': [], 'intermediate_values': [], 'pruned_branches': [], 'current_player': []}
 
             # Определяем, является ли корень MAX или MIN
             is_maximizing = True if player_role == 'MAX' else False
 
-            alpha_beta(tree_copy, is_maximizing, float('-inf'), float('inf'), debug_info, analysis_order)
+            alpha_beta(root, is_maximizing, float('-inf'), float('inf'), debug_info, analysis_order)
             print("\nРезультаты анализа с альфа-бета отсечениями:")
             print("Промежуточные оценки:")
             for name, value in debug_info['intermediate_values']:
@@ -234,7 +249,7 @@ def main():
             print("Отсеченные ветви:")
             for parent, child in debug_info['pruned_branches']:
                 print(f"Ветвь {child} отсечена от узла {parent}")
-            print(f"Выбранное значение корня: {tree_copy.minimax_value}")
+            print(f"Выбранное значение корня: {root.minimax_value}")
         elif choice == '6':
             print("\nТекущее дерево:")
             print_tree(root)
@@ -243,7 +258,6 @@ def main():
             break
         else:
             print("Неверный выбор. Попробуйте снова.")
-
 
 if __name__ == "__main__":
     main()
